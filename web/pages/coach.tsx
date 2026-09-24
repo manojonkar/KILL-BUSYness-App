@@ -61,7 +61,7 @@ export default function CoachPage() {
             </Box>
           )}
 
-          {messages.map(m => (
+          {messages?.map((m: any) => (
             <Box key={m.id} sx={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
               <Paper sx={{ 
                 p: 2, 
