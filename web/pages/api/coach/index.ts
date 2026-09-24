@@ -45,7 +45,7 @@ ${bookKnowledge}
       temperature: 0.3,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error('AI Coach Error:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), { 
