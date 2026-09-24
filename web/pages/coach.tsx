@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { Box, Typography, TextField, IconButton, Paper, Button, Container, AppBar, Toolbar } from '@mui/material';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
