@@ -1,27 +1,49 @@
 import React from 'react';
-import { useRouter } from 'next/router';
-import { Box, Typography, Card, CardContent, Container, Grid, Button, IconButton, LinearProgress, Avatar } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, LinearProgress, Container, Button, Avatar } from '@mui/material';
 import Layout from '../components/Layout';
-import { useGamification } from '../components/GamificationOverlay';
+import { useRouter } from 'next/router';
+import { supabase } from '../lib/supabase';
 
-// Premium Color Palette from the Book/Website
+// High-Performance Brand Colors
 const themeColors = {
   navyDark: '#0b1730',
-  navyLight: '#132a52',
+  navyLight: '#1e293b',
   gold: '#f59e0b',
-  textMain: '#ffffff',
-  textSub: '#c9cbd3',
+  textMain: '#f8fafc',
   bgLight: '#f8fafc',
-  // ROAR Phase Colors
-  reflect: '#3b82f6', // Light Blue
-  own: '#f59e0b',     // Gold
-  assert: '#10b981',  // Green
-  run: '#8b5cf6',     // Lavender
+  
+  // Phase Colors
+  reflect: '#3b82f6',
+  own: '#f59e0b',
+  assert: '#10b981',
+  run: '#8b5cf6'
 };
 
-export default function MobileDashboard() {
+export default function Dashboard() {
   const router = useRouter();
-  const { earnCredits, celebrateStreak } = useGamification();
+  const [userName, setUserName] = React.useState('Loading...');
+  const [initials, setInitials] = React.useState('');
+
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/login');
+      } else {
+        const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Executive';
+        setUserName(name);
+        
+        // Get initials
+        const nameParts = name.split(' ');
+        if (nameParts.length > 1) {
+          setInitials(nameParts[0][0] + nameParts[1][0]);
+        } else {
+          setInitials(name.substring(0, 2).toUpperCase());
+        }
+      }
+    };
+    fetchUser();
+  }, [router]);
 
   return (
     <Layout>
@@ -29,84 +51,45 @@ export default function MobileDashboard() {
         
         {/* Premium Header Profile Section */}
         <Box sx={{ 
-          background: `linear-gradient(135deg, ${themeColors.navyDark}, ${themeColors.navyLight})`, 
+          background: linear-gradient(135deg, , ), 
           color: themeColors.textMain,
           borderBottomLeftRadius: '32px',
           borderBottomRightRadius: '32px',
-          px: 3, pt: 8, pb: 6,
+          px: 3, pt: 3, pb: 6,
           boxShadow: '0 20px 40px -15px rgba(11, 23, 48, 0.4)'
         }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
-                Rajesh Shah
+              <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: '-0.5px' }}>
+                {userName}
               </Typography>
-              <Typography variant="body2" sx={{ color: themeColors.textSub, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.75rem', mt: 0.5 }}>
-                CEO Workspace
+              <Typography variant="caption" sx={{ color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: 'bold' }}>
+                CEO WORKSPACE
               </Typography>
             </Box>
-            <Avatar 
-              onClick={() => router.push('/profile')}
-              sx={{ bgcolor: themeColors.gold, color: themeColors.navyDark, width: 48, height: 48, fontWeight: 'bold', cursor: 'pointer' }}
-            >
-              RS
+            <Avatar sx={{ bgcolor: themeColors.gold, color: themeColors.navyDark, width: 56, height: 56, fontWeight: 'bold', border: 2px solid  }}>
+              {initials}
             </Avatar>
           </Box>
-
-          {/* MI Credits & Streak Box (Interactive Triggers) */}
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Box 
-              onClick={() => earnCredits(5, 'Daily Habit Check-in Completed', 'Own')}
-              sx={{ 
-                flex: 1, 
-                bgcolor: 'rgba(255,255,255,0.1)', 
-                borderRadius: '16px', 
-                p: 2, 
-                backdropFilter: 'blur(10px)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                '&:hover': {
-                  bgcolor: 'rgba(245, 158, 11, 0.15)',
-                  transform: 'translateY(-2px)',
-                  borderColor: themeColors.gold,
-                },
-                '&:active': {
-                  transform: 'scale(0.98)',
-                }
-              }}
-            >
-              <Typography sx={{ color: themeColors.gold, fontWeight: 'bold', fontSize: '1.2rem' }}>240</Typography>
-              <Typography sx={{ color: themeColors.textSub, fontSize: '0.75rem', textTransform: 'uppercase' }}>MI Credits ✨</Typography>
-            </Box>
-            <Box 
-              onClick={() => celebrateStreak(5, 5)}
-              sx={{ 
-                flex: 1, 
-                bgcolor: 'rgba(255,255,255,0.1)', 
-                borderRadius: '16px', 
-                p: 2, 
-                backdropFilter: 'blur(10px)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                '&:hover': {
-                  bgcolor: 'rgba(16, 185, 129, 0.15)',
-                  transform: 'translateY(-2px)',
-                  borderColor: '#10b981',
-                },
-                '&:active': {
-                  transform: 'scale(0.98)',
-                }
-              }}
-            >
-              <Typography sx={{ color: '#10b981', fontWeight: 'bold', fontSize: '1.2rem' }}>🔥 5 Days</Typography>
-              <Typography sx={{ color: themeColors.textSub, fontSize: '0.75rem', textTransform: 'uppercase' }}>Current Streak 🚀</Typography>
-            </Box>
-          </Box>
+          
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Box sx={{ bgcolor: 'rgba(255,255,255,0.1)', p: 2, borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: themeColors.gold }}>240</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#cbd5e1' }}>MI CREDITS ?</Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{ bgcolor: 'rgba(255,255,255,0.1)', p: 2, borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#10b981' }}>?? 5 Days</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#cbd5e1' }}>CURRENT STREAK ??</Typography>
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
 
-        <Container maxWidth="sm" sx={{ mt: -3 }}>
+        {/* Floating Content Area */}
+        <Container sx={{ mt: -3, position: 'relative', zIndex: 10 }}>
           
           {/* Up Next - Guided Journey Card */}
           <Card sx={{ borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)', mb: 4, overflow: 'hidden' }}>
@@ -114,11 +97,11 @@ export default function MobileDashboard() {
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                 <Typography variant="overline" sx={{ color: themeColors.navyLight, fontWeight: 'bold', letterSpacing: '1px' }}>
-                  Up Next • 2 Min Read
+                  Up Next � 2 Min Read
                 </Typography>
               </Box>
               <Typography variant="h6" sx={{ fontWeight: 800, color: themeColors.navyDark, mb: 1, lineHeight: 1.2 }}>
-                Module 4: Meetings Run on Visibility, Not Decisions
+                Module 1: The Extractive Century
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
                 Stop managing egos and start driving outcomes. Learn why the illusion of productivity is killing your strategy.
@@ -144,7 +127,7 @@ export default function MobileDashboard() {
                 <Button 
                   variant="outlined" 
                   fullWidth 
-                  onClick={() => router.push('/module/4')}
+                  onClick={() => router.push('/module/1')}
                   sx={{ 
                     borderColor: themeColors.navyDark, 
                     color: themeColors.navyDark, 
@@ -154,7 +137,7 @@ export default function MobileDashboard() {
                     py: 1.5
                   }}
                 >
-                  🎧 Listen (1:20)
+                  ?? Listen (1:20)
                 </Button>
               </Box>
             </CardContent>
@@ -181,7 +164,7 @@ export default function MobileDashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>🔍</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>??</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.reflect, mb: 0.5 }}>Reflect</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 1-4</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -207,7 +190,7 @@ export default function MobileDashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>👑</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>??</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.own, mb: 0.5 }}>Own</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 5-6</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -233,7 +216,7 @@ export default function MobileDashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>⚔️</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>???</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.assert, mb: 0.5 }}>Assert</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 7-8</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -259,7 +242,7 @@ export default function MobileDashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>🚀</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>??</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.run, mb: 0.5 }}>Run</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 9-10</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -276,4 +259,3 @@ export default function MobileDashboard() {
     </Layout>
   );
 }
-

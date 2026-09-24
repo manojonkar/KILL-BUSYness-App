@@ -1,8 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+const supabaseUrl = 'https://hnnuxambmejpjgfjnfna.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubnV4YW1ibWVqcGpnZmpuZm5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTE4MTIsImV4cCI6MjEwNTc4NzgxMn0.nlaLDrMhNi5G2x25sdR5SFcjO-XHSgkJif1jmyAeeVc';
 
-// We use the service role key to bypass RLS in the API route if needed.
-// Ensure you have SUPABASE_SERVICE_ROLE_KEY set in your environment variables.
-export const supabase = createClient(supabaseUrl, supabaseServiceKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
