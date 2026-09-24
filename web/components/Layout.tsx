@@ -1,12 +1,38 @@
-import React from 'react';
-import { Box, Paper, BottomNavigation, BottomNavigationAction, AppBar, Toolbar, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Paper, BottomNavigation, BottomNavigationAction, AppBar, Toolbar, Typography, IconButton, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [value, setValue] = React.useState(router.pathname);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const isModulePage = router.pathname.startsWith('/module/');
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'KILL BUSYness',
+      text: 'Check out KILL BUSYness - Move from Motion to Outcomes. A bite-sized learning companion for Leaders.',
+      url: 'https://app.killbusyness.com',
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        // Optionally award gamification credits here later
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      // Fallback for desktop browsers without Web Share API
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        setSnackbarOpen(true);
+      } catch (err) {
+        console.error('Failed to copy link:', err);
+      }
+    }
+  };
 
   return (
     <Box sx={{ bgcolor: '#0b1730', minHeight: '100vh', display: 'flex', justifyContent: 'center' }}>
@@ -45,6 +71,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Build High Performance Organizations
               </Typography>
             </Box>
+            <Box sx={{ flexGrow: 1 }} />
+            <IconButton onClick={handleShare} sx={{ color: 'white' }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -69,14 +105,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 '& .MuiBottomNavigationAction-root': { color: '#c9cbd3' },
               }}
             >
-              <BottomNavigationAction label="Home" value="/" icon={<span style={{fontSize: '1.5rem'}}>??</span>} />
-              <BottomNavigationAction label="Library" value="/library" icon={<span style={{fontSize: '1.5rem'}}>??</span>} />
-              <BottomNavigationAction label="Leaderboard" value="/leaderboard" icon={<span style={{fontSize: '1.5rem'}}>??</span>} />
-              <BottomNavigationAction label="Profile" value="/profile" icon={<span style={{fontSize: '1.5rem'}}>??</span>} />
+              <BottomNavigationAction label="Home" value="/" icon={<span style={{fontSize: '1.5rem'}}>🏠</span>} />
+              <BottomNavigationAction label="Library" value="/library" icon={<span style={{fontSize: '1.5rem'}}>📚</span>} />
+              <BottomNavigationAction label="Leaderboard" value="/leaderboard" icon={<span style={{fontSize: '1.5rem'}}>🏆</span>} />
+              <BottomNavigationAction label="Profile" value="/profile" icon={<span style={{fontSize: '1.5rem'}}>👤</span>} />
             </BottomNavigation>
           </Paper>
         )}
       </Box>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        message="Link copied to clipboard!"
+      />
     </Box>
   );
 }
