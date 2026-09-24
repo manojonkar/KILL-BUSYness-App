@@ -61,9 +61,11 @@ export default function ModulePage() {
           <IconButton edge="start" onClick={() => router.back()} sx={{ color: '#0b1730' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           </IconButton>
-          <Typography variant="subtitle2" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>
-            {moduleInfo.phase || 'Module'} PHASE
-          </Typography>
+          {moduleInfo.phase ? (
+            <Typography variant="subtitle2" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>
+              {moduleInfo.phase} PHASE
+            </Typography>
+          ) : <Box />}
           <Box sx={{ width: 40 }} />
         </Toolbar>
       </AppBar>
