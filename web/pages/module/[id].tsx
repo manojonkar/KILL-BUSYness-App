@@ -39,6 +39,19 @@ export default function ModulePage() {
 
   useEffect(() => {
     if (!id) return;
+    
+    // Reset audio state when switching modules
+    setAudioUrl(null);
+    setIsPlaying(false);
+    setProgress(0);
+    setAudioElement(prev => {
+      if (prev) {
+        prev.pause();
+        prev.src = '';
+      }
+      return null;
+    });
+
     fetch('/data/all_modules.json')
       .then(res => res.json())
       .then(data => {
@@ -46,14 +59,16 @@ export default function ModulePage() {
         if (found) setModuleInfo(found);
       });
       
-    // Cleanup audio on unmount
     return () => {
-      if (audioElement) {
-        audioElement.pause();
-        audioElement.src = '';
-      }
+      setAudioElement(prev => {
+        if (prev) {
+          prev.pause();
+          prev.src = '';
+        }
+        return prev;
+      });
     };
-  }, [id, audioElement]);
+  }, [id]);
 
   useEffect(() => {
     if (audioElement) {
