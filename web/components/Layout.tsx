@@ -120,6 +120,34 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onClose={() => setSnackbarOpen(false)}
         message="Link copied to clipboard!"
       />
+
+      {/* Global AI Coach Button */}
+      {router.pathname !== '/coach' && (
+        <Box 
+          onClick={() => router.push('/coach')}
+          sx={{
+            position: 'fixed',
+            bottom: isModulePage ? 24 : 80,
+            right: 24,
+            bgcolor: '#f59e0b',
+            color: '#0b1730',
+            px: 3,
+            py: 1.5,
+            borderRadius: '50px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            cursor: 'pointer',
+            boxShadow: '0 10px 25px rgba(245, 158, 11, 0.4)',
+            transition: 'transform 0.2s',
+            zIndex: 2000,
+            '&:hover': { transform: 'scale(1.05)' }
+          }}
+        >
+          <Typography sx={{ fontSize: '1.2rem' }}>🤖</Typography>
+          <Typography sx={{ fontWeight: 'bold', fontSize: '0.9rem' }}>ASK AI COACH</Typography>
+        </Box>
+      )}
     </Box>
   );
 }
