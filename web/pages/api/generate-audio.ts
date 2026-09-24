@@ -11,19 +11,44 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Text is required' });
   }
 
-  try {
-    // Mocking TTS API call
-    // In a real application, you would call an external TTS service like ElevenLabs, Google Cloud TTS, etc.
-    // const response = await fetch('https://api.tts-service.com/v1/generate', { ... });
-    
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // Mock audio URL (returning a placeholder audio file URL or base64)
-    // For this example, we return a generic sound URL
-    const mockAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+  const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+  const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID;
 
-    res.status(200).json({ audioUrl: mockAudioUrl });
+  if (!ELEVENLABS_API_KEY || !ELEVENLABS_VOICE_ID) {
+    // Fallback if the user hasn't set up the keys yet
+    return res.status(200).json({ 
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+      error: 'API Keys not configured. Using placeholder.'
+    });
+  }
+
+  try {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'audio/mpeg',
+        'xi-api-key': ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: {
+          stability: 0.7,
+          similarity_boost: 0.8,
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`ElevenLabs API error: ${response.statusText}`);
+    }
+
+    const audioBuffer = await response.arrayBuffer();
+    const base64Audio = Buffer.from(audioBuffer).toString('base64');
+    const audioDataUrl = `data:audio/mpeg;base64,${base64Audio}`;
+
+    res.status(200).json({ audioUrl: audioDataUrl });
   } catch (error) {
     console.error('Error generating audio:', error);
     res.status(500).json({ error: 'Internal Server Error' });

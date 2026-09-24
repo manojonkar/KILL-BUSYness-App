@@ -31,7 +31,9 @@ export default function ModulePage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isReflectionOpen, setIsReflectionOpen] = useState(false);
-  const [moduleInfo, setModuleInfo] = useState<any>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -41,13 +43,66 @@ export default function ModulePage() {
         const found = data.find((m: any) => m.linear_id.toString() === id.toString());
         if (found) setModuleInfo(found);
       });
-  }, [id]);
+      
+    // Cleanup audio on unmount
+    return () => {
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.src = '';
+      }
+    };
+  }, [id, audioElement]);
 
   const handleModeChange = (e: any, newMode: string) => {
     if (newMode !== null) setMode(newMode);
   };
 
-  const handlePlayPause = () => setIsPlaying(!isPlaying);
+  const loadAndPlayAudio = async () => {
+    if (audioUrl && audioElement) {
+      if (isPlaying) {
+        audioElement.pause();
+        setIsPlaying(false);
+      } else {
+        audioElement.play();
+        setIsPlaying(true);
+      }
+      return;
+    }
+
+    if (!moduleInfo || !moduleInfo.core_lesson) return;
+    
+    setIsLoadingAudio(true);
+    try {
+      const res = await fetch('/api/generate-audio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: moduleInfo.core_lesson.replace(/[#*`_]/g, '') })
+      });
+      const data = await res.json();
+      if (data.audioUrl) {
+        setAudioUrl(data.audioUrl);
+        const audio = new Audio(data.audioUrl);
+        
+        audio.addEventListener('timeupdate', () => {
+          setProgress((audio.currentTime / audio.duration) * 100 || 0);
+        });
+        
+        audio.addEventListener('ended', () => {
+          setIsPlaying(false);
+          setProgress(100);
+        });
+
+        setAudioElement(audio);
+        audio.play();
+        setIsPlaying(true);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setIsLoadingAudio(false);
+  };
+
+  const handlePlayPause = () => loadAndPlayAudio();
   const handleProgressChange = (e: any, newValue: number | number[]) => setProgress(newValue as number);
 
   if (!moduleInfo) {
@@ -95,8 +150,8 @@ export default function ModulePage() {
               </Box>
               <Slider value={progress} onChange={handleProgressChange} sx={{ color: '#f59e0b', height: 4 }} />
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mt: 2 }}>
-                <IconButton onClick={handlePlayPause} sx={{ bgcolor: '#f59e0b', color: '#0b1730', width: 64, height: 64, '&:hover': { bgcolor: '#d97706' } }}>
-                  {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                <IconButton onClick={handlePlayPause} disabled={isLoadingAudio} sx={{ bgcolor: '#f59e0b', color: '#0b1730', width: 64, height: 64, '&:hover': { bgcolor: '#d97706' } }}>
+                  {isLoadingAudio ? <Typography sx={{ fontSize: '1rem', fontWeight: 'bold' }}>...</Typography> : (isPlaying ? <PauseIcon /> : <PlayIcon />)}
                 </IconButton>
               </Box>
             </Paper>
