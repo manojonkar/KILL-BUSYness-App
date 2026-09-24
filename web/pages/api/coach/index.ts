@@ -1,4 +1,4 @@
-import { streamText, Message } from 'ai';
+import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import allModules from '../../../public/data/all_modules.json';
 
@@ -16,7 +16,7 @@ export default async function handler(req: Request) {
   }
 
   try {
-    const { messages }: { messages: Message[] } = await req.json();
+    const { messages }: { messages: any[] } = await req.json();
 
     // Compile the book into a dense knowledge base string
     // Format: Module [ID]: [Title] - [Content]
