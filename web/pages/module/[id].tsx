@@ -31,6 +31,7 @@ export default function ModulePage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isReflectionOpen, setIsReflectionOpen] = useState(false);
+  const [moduleInfo, setModuleInfo] = useState<any>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
