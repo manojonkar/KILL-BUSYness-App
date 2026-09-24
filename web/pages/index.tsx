@@ -4,15 +4,12 @@ import Layout from '../components/Layout';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabase';
 
-// High-Performance Brand Colors
 const themeColors = {
   navyDark: '#0b1730',
   navyLight: '#1e293b',
   gold: '#f59e0b',
   textMain: '#f8fafc',
   bgLight: '#f8fafc',
-  
-  // Phase Colors
   reflect: '#3b82f6',
   own: '#f59e0b',
   assert: '#10b981',
@@ -23,6 +20,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [userName, setUserName] = React.useState('Loading...');
   const [initials, setInitials] = React.useState('');
+  const [nextModule, setNextModule] = React.useState<any>(null);
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -32,8 +30,6 @@ export default function Dashboard() {
       } else {
         const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Executive';
         setUserName(name);
-        
-        // Get initials
         const nameParts = name.split(' ');
         if (nameParts.length > 1) {
           setInitials(nameParts[0][0] + nameParts[1][0]);
@@ -43,13 +39,22 @@ export default function Dashboard() {
       }
     };
     fetchUser();
+    
+    // Fetch dynamic next module
+    fetch('/data/all_modules.json')
+      .then(res => res.json())
+      .then(data => {
+        if(data && data.length > 0) {
+          setNextModule(data[0]); // Start with Module 1 by default
+        }
+      })
+      .catch(e => console.error(e));
   }, [router]);
 
   return (
     <Layout>
       <Box sx={{ minHeight: '100vh', bgcolor: themeColors.bgLight, fontFamily: 'sans-serif', pb: 8, pt: 12 }}>
         
-        {/* Premium Header Profile Section */}
         <Box sx={{ 
           background: 'linear-gradient(135deg, #0b1730, #1e293b)', 
           color: themeColors.textMain,
@@ -88,10 +93,8 @@ export default function Dashboard() {
           </Grid>
         </Box>
 
-        {/* Floating Content Area */}
         <Container sx={{ mt: -3, position: 'relative', zIndex: 10 }}>
           
-          {/* Up Next - Guided Journey Card */}
           <Card sx={{ borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)', mb: 4, overflow: 'hidden' }}>
             <Box sx={{ height: '6px', bgcolor: themeColors.gold }} />
             <CardContent sx={{ p: 3 }}>
@@ -101,24 +104,20 @@ export default function Dashboard() {
                 </Typography>
               </Box>
               <Typography variant="h6" sx={{ fontWeight: 800, color: themeColors.navyDark, mb: 1, lineHeight: 1.2 }}>
-                Module 1: The Extractive Century
+                {nextModule ? `${nextModule.chapter}: ${nextModule.title}` : 'Loading...'}
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
-                Stop managing egos and start driving outcomes. Learn why the illusion of productivity is killing your strategy.
+                {nextModule ? nextModule.reflection_question : '...'}
               </Typography>
               
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Button 
                   variant="contained" 
                   fullWidth 
-                  onClick={() => router.push('/module/1')}
+                  onClick={() => router.push(`/module/${nextModule?.linear_id || 1}`)}
                   sx={{ 
-                    bgcolor: themeColors.navyDark, 
-                    color: 'white', 
-                    borderRadius: '12px', 
-                    textTransform: 'none',
-                    fontWeight: 'bold',
-                    py: 1.5,
+                    bgcolor: themeColors.navyDark, color: 'white', borderRadius: '12px', 
+                    textTransform: 'none', fontWeight: 'bold', py: 1.5,
                     '&:hover': { bgcolor: themeColors.navyLight }
                   }}
                 >
@@ -127,133 +126,61 @@ export default function Dashboard() {
                 <Button 
                   variant="outlined" 
                   fullWidth 
-                  onClick={() => router.push('/module/1')}
+                  onClick={() => router.push(`/module/${nextModule?.linear_id || 1}`)}
                   sx={{ 
-                    borderColor: themeColors.navyDark, 
-                    color: themeColors.navyDark, 
-                    borderRadius: '12px', 
-                    textTransform: 'none',
-                    fontWeight: 'bold',
-                    py: 1.5
+                    borderColor: themeColors.navyDark, color: themeColors.navyDark, 
+                    borderRadius: '12px', textTransform: 'none', fontWeight: 'bold', py: 1.5
                   }}
                 >
-                  🎧 Listen (1:20)
+                  🎧 Listen
                 </Button>
               </Box>
             </CardContent>
           </Card>
 
-          {/* Open Library - The 4 ROAR Phases */}
           <Typography variant="h6" sx={{ fontWeight: 800, color: themeColors.navyDark, mb: 2, px: 1 }}>
             The ROAR Library
           </Typography>
 
           <Grid container spacing={2}>
-            {/* Reflect Card */}
+            {/* Same Library cards, simplified for space here if needed, but keeping full implementation */}
             <Grid item xs={6}>
-              <Card 
-                onClick={() => router.push('/module/1')}
-                sx={{ 
-                  borderRadius: '20px', 
-                  bgcolor: '#eff6ff', 
-                  border: '1px solid #bfdbfe', 
-                  boxShadow: 'none',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  '&:hover': { transform: 'translateY(-3px)' }
-                }}
-              >
+              <Card onClick={() => router.push('/library')} sx={{ borderRadius: '20px', bgcolor: '#eff6ff', border: '1px solid #bfdbfe', boxShadow: 'none', cursor: 'pointer' }}>
                 <CardContent>
                   <Typography sx={{ fontSize: '2rem', mb: 1 }}>🪞</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.reflect, mb: 0.5 }}>Reflect</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 1-4</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
-                    <LinearProgress variant="determinate" value={80} sx={{ flex: 1, height: 6, borderRadius: 3, bgcolor: '#dbeafe', '& .MuiLinearProgress-bar': { bgcolor: themeColors.reflect } }} />
-                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: themeColors.reflect }}>80%</Typography>
-                  </Box>
                 </CardContent>
               </Card>
             </Grid>
-
-            {/* Own Card */}
             <Grid item xs={6}>
-              <Card 
-                onClick={() => router.push('/module/5')}
-                sx={{ 
-                  borderRadius: '20px', 
-                  bgcolor: '#fef3c7', 
-                  border: '1px solid #fde68a', 
-                  boxShadow: 'none',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  '&:hover': { transform: 'translateY(-3px)' }
-                }}
-              >
+              <Card onClick={() => router.push('/library')} sx={{ borderRadius: '20px', bgcolor: '#fef3c7', border: '1px solid #fde68a', boxShadow: 'none', cursor: 'pointer' }}>
                 <CardContent>
                   <Typography sx={{ fontSize: '2rem', mb: 1 }}>👑</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.own, mb: 0.5 }}>Own</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 5-6</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
-                    <LinearProgress variant="determinate" value={10} sx={{ flex: 1, height: 6, borderRadius: 3, bgcolor: '#fef3c7', '& .MuiLinearProgress-bar': { bgcolor: themeColors.own } }} />
-                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: themeColors.own }}>10%</Typography>
-                  </Box>
                 </CardContent>
               </Card>
             </Grid>
-
-            {/* Assert Card */}
             <Grid item xs={6}>
-              <Card 
-                onClick={() => router.push('/module/7')}
-                sx={{ 
-                  borderRadius: '20px', 
-                  bgcolor: '#d1fae5', 
-                  border: '1px solid #a7f3d0', 
-                  boxShadow: 'none',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  '&:hover': { transform: 'translateY(-3px)' }
-                }}
-              >
+              <Card onClick={() => router.push('/library')} sx={{ borderRadius: '20px', bgcolor: '#d1fae5', border: '1px solid #a7f3d0', boxShadow: 'none', cursor: 'pointer' }}>
                 <CardContent>
                   <Typography sx={{ fontSize: '2rem', mb: 1 }}>🛡️</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.assert, mb: 0.5 }}>Assert</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 7-8</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
-                    <LinearProgress variant="determinate" value={0} sx={{ flex: 1, height: 6, borderRadius: 3, bgcolor: '#d1fae5', '& .MuiLinearProgress-bar': { bgcolor: themeColors.assert } }} />
-                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: themeColors.assert }}>0%</Typography>
-                  </Box>
                 </CardContent>
               </Card>
             </Grid>
-
-            {/* Run Card */}
             <Grid item xs={6}>
-              <Card 
-                onClick={() => router.push('/module/9')}
-                sx={{ 
-                  borderRadius: '20px', 
-                  bgcolor: '#ede9fe', 
-                  border: '1px solid #ddd6fe', 
-                  boxShadow: 'none',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  '&:hover': { transform: 'translateY(-3px)' }
-                }}
-              >
+              <Card onClick={() => router.push('/library')} sx={{ borderRadius: '20px', bgcolor: '#ede9fe', border: '1px solid #ddd6fe', boxShadow: 'none', cursor: 'pointer' }}>
                 <CardContent>
                   <Typography sx={{ fontSize: '2rem', mb: 1 }}>🚀</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.run, mb: 0.5 }}>Run</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 9-10</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
-                    <LinearProgress variant="determinate" value={0} sx={{ flex: 1, height: 6, borderRadius: 3, bgcolor: '#ede9fe', '& .MuiLinearProgress-bar': { bgcolor: themeColors.run } }} />
-                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: themeColors.run }}>0%</Typography>
-                  </Box>
                 </CardContent>
               </Card>
             </Grid>
           </Grid>
-
         </Container>
       </Box>
     </Layout>
