@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import InstallPrompt from '../components/InstallPrompt';
 
 const theme = createTheme({
   palette: {
@@ -32,6 +33,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <title>KILL BUSYness</title>
       </Head>
       <Component {...pageProps} />
+      <InstallPrompt />
     </ThemeProvider>
   );
 }
