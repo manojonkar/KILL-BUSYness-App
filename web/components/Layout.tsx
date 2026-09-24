@@ -39,7 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
             <Box>
               <Typography sx={{ fontWeight: 900, color: '#f59e0b', lineHeight: 1.1, letterSpacing: '0.5px', fontSize: '1.1rem' }}>
-                KILL BUSYness.
+                KILL BUSYness
               </Typography>
               <Typography sx={{ color: '#c9cbd3', letterSpacing: '0.2px', fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 600 }}>
                 Build High Performance Organizations
