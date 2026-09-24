@@ -6,6 +6,8 @@ import {
 } from '@mui/material';
 import Layout from '../../components/Layout';
 import ReflectionModal from '../../components/ReflectionModal';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
 const PlayIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -49,11 +51,8 @@ export default function ModulePage() {
   const handleProgressChange = (e: any, newValue: number | number[]) => setProgress(newValue as number);
 
   if (!moduleInfo) {
-    return <Layout><Box sx={{ p: 4, pt: 12, textAlign: 'center' }}><Typography>Loading the deep dive...</Typography></Box></Layout>;
+    return <Layout><Box sx={{ p: 4, pt: 12, textAlign: 'center' }}><Typography>Loading the module...</Typography></Box></Layout>;
   }
-
-  // Split the massive 400-word paragraph into readable chunks
-  const paragraphs = moduleInfo.core_lesson.split(/(?<=\.)\s+/);
 
   return (
     <Layout>
@@ -62,8 +61,8 @@ export default function ModulePage() {
           <IconButton edge="start" onClick={() => router.back()} sx={{ color: '#0b1730' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
           </IconButton>
-          <Typography variant="subtitle2" sx={{ color: '#64748b', fontWeight: 'bold' }}>
-            {moduleInfo.phase} PHASE
+          <Typography variant="subtitle2" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>
+            {moduleInfo.phase || 'Module'} PHASE
           </Typography>
           <Box sx={{ width: 40 }} />
         </Toolbar>
@@ -101,27 +100,23 @@ export default function ModulePage() {
             </Paper>
           )}
 
-          <Box sx={{ typography: 'body1', lineHeight: 1.9, color: '#1e293b', fontSize: '1.15rem', opacity: mode === 'listen' ? 0.5 : 1, transition: 'opacity 0.3s ease' }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, mb: 3, color: '#f59e0b', fontStyle: 'italic' }}>
-              {moduleInfo.reflection_question}
-            </Typography>
-            {paragraphs.map((p: string, idx: number) => {
-              if (!p.trim()) return null;
-              if (idx > 0 && idx % 3 === 0) {
-                return (
-                  <Box key={idx} sx={{ my: 4, p: 3, borderLeft: '4px solid #f59e0b', bgcolor: '#fffbeb', borderRadius: '0 8px 8px 0' }}>
-                    <Typography variant="subtitle1" sx={{ fontStyle: 'italic', color: '#b45309', fontWeight: 700 }}>
-                      "{p.trim()}"
-                    </Typography>
-                  </Box>
-                );
-              }
-              return (
-                <Typography key={idx} variant="body1" paragraph sx={{ fontSize: '1.15rem', lineHeight: 1.9, mb: 3 }}>
-                  {p.trim()}.
-                </Typography>
-              );
-            })}
+          <Box sx={{ 
+            typography: 'body1', 
+            lineHeight: 1.9, 
+            color: '#1e293b', 
+            fontSize: '1.15rem', 
+            opacity: mode === 'listen' ? 0.5 : 1, 
+            transition: 'opacity 0.3s ease',
+            '& img': { maxWidth: '100%', height: 'auto', borderRadius: '8px', my: 4, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' },
+            '& h1, & h2, & h3': { color: '#0b1730', fontWeight: 800, mt: 4, mb: 2 },
+            '& blockquote': { borderLeft: '4px solid #f59e0b', bgcolor: '#fffbeb', p: 3, my: 4, borderRadius: '0 8px 8px 0', fontStyle: 'italic', color: '#b45309', fontWeight: 700 },
+            '& table': { width: '100%', borderCollapse: 'collapse', mb: 4 },
+            '& th, & td': { border: '1px solid #e2e8f0', p: 2, textAlign: 'left' },
+            '& th': { bgcolor: '#f1f5f9', fontWeight: 'bold' }
+          }}>
+            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+              {moduleInfo.core_lesson}
+            </ReactMarkdown>
           </Box>
           
           <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
