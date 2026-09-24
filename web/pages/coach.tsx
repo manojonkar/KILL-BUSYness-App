@@ -6,6 +6,7 @@ import Layout from '../components/Layout';
 
 export default function CoachPage() {
   const router = useRouter();
+  // @ts-ignore
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/coach'
   }) as any;
