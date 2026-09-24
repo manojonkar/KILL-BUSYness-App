@@ -138,6 +138,39 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* Gamified Invite Banner */}
+          <Card sx={{ borderRadius: '24px', boxShadow: '0 10px 30px rgba(245, 158, 11, 0.2)', mb: 4, overflow: 'hidden', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#0b1730' }}>
+            <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ flexShrink: 0, bgcolor: 'rgba(255,255,255,0.3)', borderRadius: '50%', width: 60, height: 60, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2rem' }}>
+                🎁
+              </Box>
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, lineHeight: 1.1, mb: 0.5 }}>
+                  Refer & Earn +50 MI Credits
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, opacity: 0.9, mb: 2 }}>
+                  Invite a colleague and earn credits when they read their first module!
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  onClick={async () => {
+                    const text = 'Check out KILL BUSYness - Move from Activities to Outcomes. Join me on the app!';
+                    const url = 'https://app.killbusyness.com';
+                    if (navigator.share) {
+                      navigator.share({ title: 'KILL BUSYness', text, url }).catch(console.error);
+                    } else {
+                      navigator.clipboard.writeText(url);
+                      alert('Link copied to clipboard!');
+                    }
+                  }}
+                  sx={{ bgcolor: '#0b1730', color: 'white', fontWeight: 'bold', borderRadius: 2, textTransform: 'none', px: 3, '&:hover': { bgcolor: '#1e293b' } }}
+                >
+                  Share Now
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+
           <Typography variant="h6" sx={{ fontWeight: 800, color: themeColors.navyDark, mb: 2, px: 1 }}>
             The ROAR Library
           </Typography>
