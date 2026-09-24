@@ -49,7 +49,7 @@ export default function ModulePage() {
   const handleProgressChange = (e: any, newValue: number | number[]) => setProgress(newValue as number);
 
   if (!moduleInfo) {
-    return <Layout><Box sx={{ p: 4, pt: 12, textAlign: 'center' }}><Typography>Loading the 400-word deep dive...</Typography></Box></Layout>;
+    return <Layout><Box sx={{ p: 4, pt: 12, textAlign: 'center' }}><Typography>Loading the deep dive...</Typography></Box></Layout>;
   }
 
   // Split the massive 400-word paragraph into readable chunks
@@ -89,7 +89,7 @@ export default function ModulePage() {
             <Paper elevation={0} sx={{ p: 3, mb: 5, borderRadius: 4, bgcolor: '#0b1730', color: 'white', boxShadow: '0 10px 15px -3px rgb(11 23 48 / 0.3)' }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
                 <Box sx={{ width: 120, height: 120, borderRadius: '50%', bgcolor: '#1e293b', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '4px solid #f59e0b' }}>
-                  <Typography variant="h2" sx={{ color: '#f59e0b' }}>??</Typography>
+                  <Typography variant="h2" sx={{ color: '#f59e0b' }}>🎧</Typography>
                 </Box>
               </Box>
               <Slider value={progress} onChange={handleProgressChange} sx={{ color: '#f59e0b', height: 4 }} />
@@ -107,7 +107,6 @@ export default function ModulePage() {
             </Typography>
             {paragraphs.map((p: string, idx: number) => {
               if (!p.trim()) return null;
-              // Every 3rd paragraph, make it a pull quote
               if (idx > 0 && idx % 3 === 0) {
                 return (
                   <Box key={idx} sx={{ my: 4, p: 3, borderLeft: '4px solid #f59e0b', bgcolor: '#fffbeb', borderRadius: '0 8px 8px 0' }}>
@@ -126,8 +125,8 @@ export default function ModulePage() {
           </Box>
           
           <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-            <Button variant="outlined" size="large" onClick={() => router.push(\/module/\\)} sx={{ color: '#0b1730', borderColor: '#0b1730', borderWidth: 2, fontWeight: 'bold', px: 4, py: 1.5, borderRadius: 2 }}>
-              Next Module ?
+            <Button variant="outlined" size="large" onClick={() => router.push(`/module/${parseInt(moduleId) + 1}`)} sx={{ color: '#0b1730', borderColor: '#0b1730', borderWidth: 2, fontWeight: 'bold', px: 4, py: 1.5, borderRadius: 2 }}>
+              Next Module ➔
             </Button>
           </Box>
         </Container>
@@ -136,7 +135,7 @@ export default function ModulePage() {
       <Paper elevation={24} sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, p: 2, bgcolor: 'white', borderTop: '1px solid #e2e8f0', zIndex: 1000 }}>
         <Container maxWidth="sm">
           <Button variant="contained" fullWidth size="large" sx={{ bgcolor: '#3b82f6', color: 'white', py: 2, fontSize: '1.1rem', fontWeight: 'bold', borderRadius: 3 }} onClick={() => setIsReflectionOpen(true)}>
-            Reflect & Earn 5 Credits ?
+            Reflect & Earn 5 Credits ✅
           </Button>
         </Container>
       </Paper>
