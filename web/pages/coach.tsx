@@ -8,7 +8,7 @@ export default function CoachPage() {
   const router = useRouter();
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: '/api/coach'
-  });
+  }) as any;
   
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
