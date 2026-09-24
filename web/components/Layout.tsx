@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const handleShare = async () => {
     const shareData = {
       title: 'KILL BUSYness',
-      text: 'Check out KILL BUSYness - Move from Motion to Outcomes. A bite-sized learning companion for Leaders.',
+      text: 'Check out KILL BUSYness - Move from Activities to Outcomes. A bite-sized learning companion for Leaders.',
       url: 'https://app.killbusyness.com',
     };
 
