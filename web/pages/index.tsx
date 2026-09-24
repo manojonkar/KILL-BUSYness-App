@@ -67,7 +67,7 @@ export default function Dashboard() {
                 CEO WORKSPACE
               </Typography>
             </Box>
-            <Avatar sx={{ bgcolor: themeColors.gold, color: themeColors.navyDark, width: 56, height: 56, fontWeight: 'bold', border: 2px solid  }}>
+            <Avatar sx={{ bgcolor: themeColors.gold, color: themeColors.navyDark, width: 56, height: 56, fontWeight: 'bold', border: '2px solid #f8fafc' }}>
               {initials}
             </Avatar>
           </Box>
@@ -76,13 +76,13 @@ export default function Dashboard() {
             <Grid item xs={6}>
               <Box sx={{ bgcolor: 'rgba(255,255,255,0.1)', p: 2, borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
                 <Typography variant="h5" sx={{ fontWeight: 900, color: themeColors.gold }}>240</Typography>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#cbd5e1' }}>MI CREDITS ?</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#cbd5e1' }}>MI CREDITS ✨</Typography>
               </Box>
             </Grid>
             <Grid item xs={6}>
               <Box sx={{ bgcolor: 'rgba(255,255,255,0.1)', p: 2, borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: '#10b981' }}>?? 5 Days</Typography>
-                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#cbd5e1' }}>CURRENT STREAK ??</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#10b981' }}>🔥 5 Days</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#cbd5e1' }}>CURRENT STREAK 🚀</Typography>
               </Box>
             </Grid>
           </Grid>
@@ -97,7 +97,7 @@ export default function Dashboard() {
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                 <Typography variant="overline" sx={{ color: themeColors.navyLight, fontWeight: 'bold', letterSpacing: '1px' }}>
-                  Up Next � 2 Min Read
+                  Up Next • 2 Min Read
                 </Typography>
               </Box>
               <Typography variant="h6" sx={{ fontWeight: 800, color: themeColors.navyDark, mb: 1, lineHeight: 1.2 }}>
@@ -137,7 +137,7 @@ export default function Dashboard() {
                     py: 1.5
                   }}
                 >
-                  ?? Listen (1:20)
+                  🎧 Listen (1:20)
                 </Button>
               </Box>
             </CardContent>
@@ -164,7 +164,7 @@ export default function Dashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>??</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>🪞</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.reflect, mb: 0.5 }}>Reflect</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 1-4</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -190,7 +190,7 @@ export default function Dashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>??</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>👑</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.own, mb: 0.5 }}>Own</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 5-6</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -216,7 +216,7 @@ export default function Dashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>???</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>🛡️</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.assert, mb: 0.5 }}>Assert</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 7-8</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
@@ -242,7 +242,7 @@ export default function Dashboard() {
                 }}
               >
                 <CardContent>
-                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>??</Typography>
+                  <Typography sx={{ fontSize: '2rem', mb: 1 }}>🚀</Typography>
                   <Typography sx={{ fontWeight: 'bold', color: themeColors.run, mb: 0.5 }}>Run</Typography>
                   <Typography variant="caption" sx={{ color: '#475569' }}>Chapters 9-10</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
