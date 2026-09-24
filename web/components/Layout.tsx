@@ -108,6 +108,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <BottomNavigationAction label="Home" value="/" icon={<span style={{fontSize: '1.5rem'}}>🏠</span>} />
               <BottomNavigationAction label="Library" value="/library" icon={<span style={{fontSize: '1.5rem'}}>📚</span>} />
               <BottomNavigationAction label="Leaderboard" value="/leaderboard" icon={<span style={{fontSize: '1.5rem'}}>🏆</span>} />
+              <BottomNavigationAction label="Teams" value="/teams" icon={<span style={{fontSize: '1.5rem'}}>👥</span>} />
               <BottomNavigationAction label="Profile" value="/profile" icon={<span style={{fontSize: '1.5rem'}}>👤</span>} />
             </BottomNavigation>
           </Paper>
