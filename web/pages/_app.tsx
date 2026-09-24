@@ -26,7 +26,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         <meta name="theme-color" content="#0b1730" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="ROAR" />
+        <meta name="apple-mobile-web-app-title" content="KILL BUSYness" />
         <link rel="apple-touch-icon" href="/emblem.jpg" />
         <link rel="icon" type="image/jpeg" href="/emblem.jpg" />
         <title>KILL BUSYness</title>
