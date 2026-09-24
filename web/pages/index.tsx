@@ -51,7 +51,7 @@ export default function Dashboard() {
         
         {/* Premium Header Profile Section */}
         <Box sx={{ 
-          background: linear-gradient(135deg, , ), 
+          background: 'linear-gradient(135deg, #0b1730, #1e293b)', 
           color: themeColors.textMain,
           borderBottomLeftRadius: '32px',
           borderBottomRightRadius: '32px',
