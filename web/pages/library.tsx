@@ -29,8 +29,8 @@ export default function Library() {
     for(let i=1; i<=p.count; i++) {
       phaseModules.push({
         id: currentId++,
-        title: \Module \\,
-        description: \Deep dive into the \ methodology.\,
+        title: `Module ${currentId-1}`,
+        description: `Deep dive into the ${p.label} methodology.`,
         phase: p.id
       });
     }
@@ -62,7 +62,7 @@ export default function Library() {
               variant="fullWidth"
               sx={{
                 '& .MuiTabs-indicator': { backgroundColor: activeColor, height: 3 },
-                '& .Mui-selected': { color: \\ !important\, fontWeight: 'bold' }
+                '& .Mui-selected': { color: `${activeColor} !important`, fontWeight: 'bold' }
               }}
             >
               {phases.map((phase) => (
@@ -81,9 +81,9 @@ export default function Library() {
                   transition: 'transform 0.2s',
                   '&:hover': { transform: 'translateY(-2px)', borderColor: activeColor }
                 }}>
-                  <CardActionArea onClick={() => router.push(\/module/\\)} sx={{ p: 2 }}>
+                  <CardActionArea onClick={() => router.push(`/module/${module.id}`)} sx={{ p: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Chip label={phases[activeTab].label} size="small" sx={{ bgcolor: \\22\, color: activeColor, fontWeight: 'bold' }} />
+                      <Chip label={phases[activeTab].label} size="small" sx={{ bgcolor: `${activeColor}22`, color: activeColor, fontWeight: 'bold' }} />
                       <Typography variant="caption" sx={{ fontWeight: 'bold', color: '#94a3b8' }}>2 MIN</Typography>
                     </Box>
                     <Typography variant="h6" sx={{ fontWeight: 800, color: '#0b1730', mb: 1 }}>
