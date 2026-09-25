@@ -1,7 +1,7 @@
 {
   "name": "KILL BUSYness",
   "short_name": "KILL BUSYness",
-  "description": "KILL BUSYness - Move from Motion to Outcomes. Bite-sized learning companion for Leaders.",
+  "description": "KILL BUSYness - Move from Activities to Outcomes. Bite-sized learning companion for Leaders.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -9,7 +9,7 @@
   "theme_color": "#0b1730",
   "icons": [
     {
-      "src": "/emblem-padded.jpg",
+      "src": "/emblem-splash.jpg",
       "sizes": "192x192 512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
