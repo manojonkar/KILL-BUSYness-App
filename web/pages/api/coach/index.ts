@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { generateText } from 'ai';
 import { google } from '@ai-sdk/google';
 import allModules from '../../../public/data/all_modules.json';
 
@@ -18,7 +18,6 @@ export default async function handler(req: Request) {
   try {
     const { messages }: { messages: any[] } = await req.json();
 
-    // Compile the book into a dense knowledge base string
     const bookKnowledge = allModules.map((m: any) => 
       `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
     ).join('\n\n---\n\n');
@@ -37,17 +36,17 @@ CRITICAL INSTRUCTIONS:
 ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
-    const result = await streamText({
+    const result = await generateText({
       model: google('gemini-1.5-flash'),
       system: systemPrompt,
       messages,
       temperature: 0.3,
     });
 
-    return result.toTextStreamResponse();
-  } catch (error) {
+    return new Response(result.text, { status: 200, headers: { 'Content-Type': 'text/plain' } });
+  } catch (error: any) {
     console.error('AI Coach Error:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { 
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
