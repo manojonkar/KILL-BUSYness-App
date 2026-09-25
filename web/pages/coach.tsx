@@ -6,7 +6,8 @@ import Layout from '../components/Layout';
 
 export default function CoachPage() {
   const router = useRouter();
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+  const [input, setInput] = useState('');
+  const chatObj = useChat({
     api: '/api/coach',
     onError: (err: Error) => {
       console.error('Chat error:', err);
@@ -14,11 +15,24 @@ export default function CoachPage() {
     }
   } as any) as any;
 
+  const messages = chatObj.messages || [];
+  const status = chatObj.status || '';
+  const isLoading = status === 'submitted' || status === 'streaming' || chatObj.isLoading;
+
   const handleCustomSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    
     console.log("Submitting form...", input);
     try {
-      handleSubmit(e);
+      if (chatObj.append) {
+        chatObj.append({ role: 'user', content: input });
+      } else if (chatObj.sendMessage) {
+        chatObj.sendMessage({ role: 'user', content: input });
+      } else {
+        throw new Error("SDK method missing. Available keys: " + Object.keys(chatObj).join(', '));
+      }
+      setInput('');
     } catch (err: any) {
       console.error("Submit error:", err);
       alert("Submit Error: " + err.message);
@@ -145,7 +159,7 @@ export default function CoachPage() {
               variant="standard"
               placeholder="Ask the AI Coach..."
               value={input}
-              onChange={handleInputChange}
+              onChange={(e) => setInput(e.target.value)}
               disabled={isLoading}
               InputProps={{ disableUnderline: true, sx: { px: 2, py: 1 } }}
             />
