@@ -22,7 +22,7 @@ export default async function handler(req: Request) {
   try {
     const { messages }: { messages: any[] } = await req.json();
 
-    const bookKnowledge = allModules.map((m: any) => 
+    const bookKnowledge = allModules.slice(0, 1).map((m: any) => 
       `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
     ).join('\n\n---\n\n');
 
