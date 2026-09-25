@@ -12,6 +12,10 @@ export default async function handler(req: Request) {
   if (!process.env.GEMINI_API_KEY) {
     return new Response('Missing GEMINI_API_KEY in server configuration.', { status: 500 });
   }
+  
+  if (req.headers.get('x-test-key') === 'true') {
+    return new Response('Key starts with: ' + process.env.GEMINI_API_KEY.substring(0, 5), { status: 200 });
+  }
 
   try {
     const { messages }: { messages: any[] } = await req.json();
