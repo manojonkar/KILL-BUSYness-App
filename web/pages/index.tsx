@@ -3,6 +3,7 @@ import { Box, Typography, Card, CardContent, Grid, LinearProgress, Container, Bu
 import Layout from '../components/Layout';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabase';
+import { useGamification } from '../components/GamificationOverlay';
 
 const themeColors = {
   navyDark: '#0b1730',
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const [userName, setUserName] = React.useState('Loading...');
   const [initials, setInitials] = React.useState('');
   const [nextModule, setNextModule] = React.useState<any>(null);
+  const { earnCredits } = useGamification();
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -138,6 +140,37 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* Masterclass Banner */}
+          <Card sx={{ borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', mb: 4, overflow: 'hidden', background: '#0b1730', color: 'white' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="overline" sx={{ color: '#f59e0b', fontWeight: 'bold', letterSpacing: '1px' }}>
+                  Live Masterclass
+                </Typography>
+                <Typography variant="caption" sx={{ bgcolor: 'rgba(255,255,255,0.1)', px: 1.5, py: 0.5, borderRadius: 2 }}>
+                  Earn +15 Credits
+                </Typography>
+              </Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, mb: 1, lineHeight: 1.2 }}>
+                The Generative Leader
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#94a3b8', mb: 3 }}>
+                Join Manoj Onkar live to diagnose your organization's BUSYness and build a high-performance roadmap.
+              </Typography>
+              <Button 
+                variant="contained" 
+                fullWidth
+                onClick={() => {
+                  earnCredits(15, 'Registered for Masterclass', 'Run');
+                  window.open('https://www.killbusyness.com/contact', '_blank');
+                }}
+                sx={{ bgcolor: '#f59e0b', color: '#0b1730', fontWeight: 'bold', borderRadius: 2, textTransform: 'none', py: 1.5, '&:hover': { bgcolor: '#d97706' } }}
+              >
+                Register Now
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Gamified Invite Banner */}
           <Card sx={{ borderRadius: '24px', boxShadow: '0 10px 30px rgba(245, 158, 11, 0.2)', mb: 4, overflow: 'hidden', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#0b1730' }}>
             <CardContent sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -213,7 +246,34 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </Grid>
+            
+            {/* New Resources Link */}
+            <Grid item xs={12}>
+              <Card onClick={() => router.push('/resources')} sx={{ borderRadius: '20px', bgcolor: '#0b1730', color: 'white', boxShadow: '0 8px 20px rgba(0,0,0,0.15)', cursor: 'pointer' }}>
+                <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Typography sx={{ fontWeight: 'bold', color: '#0E9C74', mb: 0.5 }}>Executive Briefings</Typography>
+                    <Typography variant="caption" sx={{ color: '#94a3b8' }}>20 Video Masterclasses</Typography>
+                  </Box>
+                  <Typography sx={{ fontSize: '2rem' }}>▶️</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
           </Grid>
+          
+          {/* Buy Paperback Link using Credits */}
+          <Card onClick={() => window.open('https://www.killbusyness.com/buy?format=paperback&appliedCredits=1', '_blank')} sx={{ mt: 4, borderRadius: '24px', bgcolor: '#ffffff', border: '2px solid #0b1730', cursor: 'pointer', '&:hover': { bgcolor: '#f8fafc' } }}>
+            <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <img src="/img/book-cover.webp" alt="Book" style={{ width: 60, borderRadius: 4, boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }} onError={(e) => { e.currentTarget.src = '/emblem-splash.jpg' }} />
+              <Box>
+                <Typography sx={{ fontWeight: 900, color: '#0b1730' }}>Order the Paperback</Typography>
+                <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mb: 0.5 }}>For your team or library.</Typography>
+                <Typography variant="caption" sx={{ bgcolor: '#dcfce7', color: '#166534', px: 1, py: 0.25, borderRadius: 1, fontWeight: 'bold' }}>
+                  Use MI Credits for a Discount!
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
         </Container>
       </Box>
     </Layout>
