@@ -41,7 +41,7 @@ ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
     const result = await streamText({
-      model: google('gemini-1.5-flash-latest'),
+      model: google('gemini-1.5-flash-001'),
       system: systemPrompt,
       messages,
       temperature: 0.3,
