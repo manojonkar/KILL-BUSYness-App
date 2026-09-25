@@ -1,5 +1,5 @@
 import { streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { google } from '@ai-sdk/google';
 import allModules from '../../../public/data/all_modules.json';
 
 export const config = {
@@ -11,15 +11,14 @@ export default async function handler(req: Request) {
     return new Response('Method Not Allowed', { status: 405 });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    return new Response('Missing OpenAI API Key in server configuration.', { status: 500 });
+  if (!process.env.GEMINI_API_KEY) {
+    return new Response('Missing GEMINI_API_KEY in server configuration.', { status: 500 });
   }
 
   try {
     const { messages }: { messages: any[] } = await req.json();
 
     // Compile the book into a dense knowledge base string
-    // Format: Module [ID]: [Title] - [Content]
     const bookKnowledge = allModules.map((m: any) => 
       `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
     ).join('\n\n---\n\n');
@@ -39,7 +38,7 @@ ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
     const result = await streamText({
-      model: openai('gpt-4o-mini'),
+      model: google('gemini-1.5-flash'),
       system: systemPrompt,
       messages,
       temperature: 0.3,
