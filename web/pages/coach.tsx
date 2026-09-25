@@ -8,7 +8,7 @@ export default function CoachPage() {
   const router = useRouter();
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: '/api/coach',
-    onError: (err) => {
+    onError: (err: Error) => {
       console.error('Chat error:', err);
       alert('Error connecting to Coach API: ' + err.message);
     }
