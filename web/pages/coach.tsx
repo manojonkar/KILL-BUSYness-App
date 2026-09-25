@@ -6,8 +6,12 @@ import Layout from '../components/Layout';
 
 export default function CoachPage() {
   const router = useRouter();
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/coach'
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
+    api: '/api/coach',
+    onError: (err) => {
+      console.error('Chat error:', err);
+      alert('Error connecting to Coach API: ' + err.message);
+    }
   } as any) as any;
   
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
