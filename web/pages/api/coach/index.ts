@@ -62,7 +62,8 @@ ${bookKnowledge}
     const textResponse = data.candidates[0].content.parts[0].text;
     
     // Simulate Vercel AI SDK text stream format for the frontend (0:"text")
-    const streamPayload = \`0:"\${textResponse.replace(/\\n/g, '\\\\n').replace(/"/g, '\\\\"')}"\\n\`;
+    const jsonString = JSON.stringify(textResponse);
+    const streamPayload = '0:' + jsonString + '\\n';
 
     return new Response(streamPayload, {
       status: 200,
