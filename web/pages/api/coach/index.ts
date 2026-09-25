@@ -1,5 +1,3 @@
-import { streamText, generateText } from 'ai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import allModules from '../../../public/data/all_modules.json';
 
 export const config = {
@@ -15,14 +13,10 @@ export default async function handler(req: Request) {
     return new Response('Missing GEMINI_API_KEY in server configuration.', { status: 500 });
   }
 
-  const google = createGoogleGenerativeAI({
-    apiKey: process.env.GEMINI_API_KEY,
-  });
-
   try {
     const { messages }: { messages: any[] } = await req.json();
 
-    const bookKnowledge = allModules.slice(0, 1).map((m: any) => 
+    const bookKnowledge = allModules.slice(0, 10).map((m: any) => 
       `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
     ).join('\n\n---\n\n');
 
@@ -40,14 +34,40 @@ CRITICAL INSTRUCTIONS:
 ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
-    const result = await generateText({
-      model: google('gemini-1.5-flash'),
-      system: systemPrompt,
-      messages,
-      temperature: 0.3,
+    const userMessage = messages[messages.length - 1].content;
+
+    const payload = {
+      system_instruction: {
+        parts: { text: systemPrompt }
+      },
+      contents: [{
+        parts: [{ text: userMessage }]
+      }]
+    };
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
 
-    return new Response(result.text, { status: 200, headers: { 'Content-Type': 'text/plain' } });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data.error));
+    }
+
+    const textResponse = data.candidates[0].content.parts[0].text;
+    
+    // Simulate Vercel AI SDK text stream format for the frontend (0:"text")
+    const streamPayload = \`0:"\${textResponse.replace(/\\n/g, '\\\\n').replace(/"/g, '\\\\"')}"\\n\`;
+
+    return new Response(streamPayload, {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
   } catch (error: any) {
     console.error('AI Coach Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { 
