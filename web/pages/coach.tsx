@@ -13,6 +13,17 @@ export default function CoachPage() {
       alert('Error connecting to Coach API: ' + err.message);
     }
   } as any) as any;
+
+  const handleCustomSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("Submitting form...", input);
+    try {
+      handleSubmit(e);
+    } catch (err: any) {
+      console.error("Submit error:", err);
+      alert("Submit Error: " + err.message);
+    }
+  };
   
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   
@@ -128,7 +139,7 @@ export default function CoachPage() {
 
         {/* Input Form */}
         <Box sx={{ p: 2, bgcolor: 'white', borderRadius: 10, boxShadow: '0 -10px 40px rgba(0,0,0,0.05)' }}>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '8px' }}>
+          <form onSubmit={handleCustomSubmit} style={{ display: 'flex', gap: '8px' }}>
             <TextField
               fullWidth
               variant="standard"
