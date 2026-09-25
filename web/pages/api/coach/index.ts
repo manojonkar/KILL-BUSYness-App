@@ -1,5 +1,5 @@
-import { generateText } from 'ai';
-import { google } from '@ai-sdk/google';
+import { streamText } from 'ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import allModules from '../../../public/data/all_modules.json';
 
 export const config = {
@@ -14,6 +14,10 @@ export default async function handler(req: Request) {
   if (!process.env.GEMINI_API_KEY) {
     return new Response('Missing GEMINI_API_KEY in server configuration.', { status: 500 });
   }
+
+  const google = createGoogleGenerativeAI({
+    apiKey: process.env.GEMINI_API_KEY,
+  });
 
   try {
     const { messages }: { messages: any[] } = await req.json();
@@ -36,14 +40,14 @@ CRITICAL INSTRUCTIONS:
 ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
-    const result = await generateText({
+    const result = await streamText({
       model: google('gemini-1.5-flash'),
       system: systemPrompt,
       messages,
       temperature: 0.3,
     });
 
-    return new Response(result.text, { status: 200, headers: { 'Content-Type': 'text/plain' } });
+    return result.toTextStreamResponse();
   } catch (error: any) {
     console.error('AI Coach Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { 
