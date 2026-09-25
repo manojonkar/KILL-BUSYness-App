@@ -40,14 +40,14 @@ CRITICAL INSTRUCTIONS:
 ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
-    const result = await streamText({
+    const result = await generateText({
       model: google('gemini-1.5-flash-001'),
       system: systemPrompt,
       messages,
       temperature: 0.3,
     });
 
-    return result.toTextStreamResponse();
+    return new Response(result.text, { status: 200, headers: { 'Content-Type': 'text/plain' } });
   } catch (error: any) {
     console.error('AI Coach Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { 
