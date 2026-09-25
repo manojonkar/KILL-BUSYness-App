@@ -41,7 +41,7 @@ ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
     const result = await generateText({
-      model: google('gemini-1.5-pro'),
+      model: google('gemini-pro'),
       system: systemPrompt,
       messages,
       temperature: 0.3,
