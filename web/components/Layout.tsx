@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Paper, BottomNavigation, BottomNavigationAction, AppBar, Toolbar, Typography, IconButton, Snackbar, useMediaQuery, useTheme, Button } from '@mui/material';
+import { Box, Paper, BottomNavigation, BottomNavigationAction, AppBar, Toolbar, Typography, IconButton, Snackbar, useMediaQuery, useTheme, Button, Container } from '@mui/material';
 import { useRouter } from 'next/router';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
