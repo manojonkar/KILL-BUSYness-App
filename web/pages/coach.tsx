@@ -81,9 +81,13 @@ export default function CoachPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     
-    // Show feedback buttons only when AI finishes responding
     if (messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !isLoading) {
-      setShowFeedback(true);
+      if (messages[messages.length - 1].content.includes('[END_SESSION]')) {
+        setShowFeedback(true);
+      } else {
+        setShowFeedback(false);
+        setFeedbackGiven(null);
+      }
     } else {
       setShowFeedback(false);
       setFeedbackGiven(null);
@@ -142,7 +146,9 @@ export default function CoachPage() {
                   '100%': { opacity: 0.6 }
                 }
               }}>
-                <Typography variant="body1" sx={{ lineHeight: 1.6 }}>{m.content}</Typography>
+                <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                  {m.content.replace('\\[END_SESSION\\]', '').replace('[END_SESSION]', '').trim()}
+                </Typography>
               </Paper>
             </Box>
           ))}
