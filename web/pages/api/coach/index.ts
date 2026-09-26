@@ -16,9 +16,9 @@ export default async function handler(req: Request) {
   try {
     const { messages }: { messages: any[] } = await req.json();
 
-    // Google's new 3.8-flash model has an 8k token limit, so we can't stuff all 80 modules in.
-    // We slice to the first 10 modules (~4000 tokens) to ensure it fits safely.
-    const bookKnowledge = allModules.slice(0, 10).map((m: any) => 
+    // We use gemini-3.5-flash-lite because it handles the massive 1M token context window flawlessly
+    // and is highly resilient against Google's 503 free-tier throttling.
+    const bookKnowledge = allModules.map((m: any) => 
       `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
     ).join('\n\n---\n\n');
 
@@ -47,7 +47,7 @@ ${bookKnowledge}
       }]
     };
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.8-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
