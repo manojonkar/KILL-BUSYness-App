@@ -155,7 +155,7 @@ export default function CoachPage() {
                     sx={{ bgcolor: 'white', mb: 2 }}
                   />
                   <Button variant="contained" color="error" fullWidth onClick={handleEmailSubmit}>
-                    Email Manoj Onkar
+                    Email KillBUSYness Team
                   </Button>
                 </Paper>
               )}
