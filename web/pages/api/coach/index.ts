@@ -1,5 +1,3 @@
-import { streamText } from 'ai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import allModules from '../../../public/data/all_modules.json';
 
 export const config = {
@@ -14,10 +12,6 @@ export default async function handler(req: Request) {
   if (!process.env.GEMINI_API_KEY) {
     return new Response('Missing GEMINI_API_KEY in server configuration.', { status: 500 });
   }
-
-  const google = createGoogleGenerativeAI({
-    apiKey: process.env.GEMINI_API_KEY,
-  });
 
   try {
     const { messages }: { messages: any[] } = await req.json();
@@ -40,14 +34,41 @@ CRITICAL INSTRUCTIONS:
 ${bookKnowledge}
 --- END BOOK KNOWLEDGE BASE ---`;
 
-    const result = await streamText({
-      model: google('gemini-3.8-flash'),
-      system: systemPrompt,
-      messages,
-      temperature: 0.3,
+    const userMessage = messages[messages.length - 1].content;
+
+    const payload = {
+      system_instruction: {
+        parts: { text: systemPrompt }
+      },
+      contents: [{
+        parts: [{ text: userMessage }]
+      }]
+    };
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.8-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
 
-    return result.toTextStreamResponse();
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data.error));
+    }
+
+    const textResponse = data.candidates[0].content.parts[0].text;
+    
+    // Simulate Vercel AI SDK text stream format for the frontend (0:"text")
+    const jsonString = JSON.stringify(textResponse);
+    const streamPayload = '0:' + jsonString + '\\n';
+
+    return new Response(streamPayload, {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
   } catch (error: any) {
     console.error('AI Coach Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { 
