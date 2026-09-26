@@ -7,17 +7,8 @@ import Layout from '../components/Layout';
 export default function CoachPage() {
   const router = useRouter();
   const [input, setInput] = useState('');
-  const chatObj = useChat({
-    api: '/api/coach',
-    onError: (err: Error) => {
-      console.error('Chat error:', err);
-      alert('Error connecting to Coach API: ' + err.message);
-    }
-  } as any) as any;
-
-  const messages = chatObj.messages || [];
-  const status = chatObj.status || '';
-  const isLoading = status === 'submitted' || status === 'streaming' || chatObj.isLoading;
+  const [messages, setMessages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCustomSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,7 +16,8 @@ export default function CoachPage() {
     
     const userMessage = input;
     setInput('');
-    chatObj.setMessages([...messages, { id: Date.now().toString(), role: 'user', content: userMessage }]);
+    setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'user', content: userMessage }]);
+    setIsLoading(true);
     
     try {
       const res = await fetch('/api/coach', {
@@ -36,18 +28,28 @@ export default function CoachPage() {
       
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`Server returned ${res.status}: ${errorText.substring(0, 100)}`);
+        throw new Error(errorText);
       }
       
       const data = await res.json();
       
-      chatObj.setMessages((prev: any) => [
+      setMessages((prev) => [
         ...prev, 
-        { id: 'ai-temp', role: 'assistant', content: data.text }
+        { id: Date.now().toString(), role: 'assistant', content: data.text || "Sorry, I received an empty response. Please try again." }
       ]);
     } catch (err: any) {
       console.error("Submit error:", err);
-      alert("Submit Error: " + err.message);
+      let errorMsg = "An error occurred while connecting to the Coach. Please try again.";
+      if (err.message.includes("503") || err.message.includes("high demand")) {
+        errorMsg = "Google's AI servers are currently experiencing extremely high demand and are overloaded. Please wait a moment and try asking again.";
+      }
+      
+      setMessages((prev) => [
+        ...prev, 
+        { id: Date.now().toString(), role: 'assistant', content: `⚠️ **Server Overloaded**\n\n${errorMsg}` }
+      ]);
+    } finally {
+      setIsLoading(false);
     }
   };
   
