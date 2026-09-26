@@ -1,4 +1,5 @@
 import allModules from '../../../public/data/all_modules.json';
+import { masterTrainingManual } from '../../../public/data/master_coach_training';
 
 export const config = {
   runtime: 'edge',
@@ -27,15 +28,22 @@ Your job is to answer the user's questions strictly based on the book text provi
 
 CRITICAL INSTRUCTIONS:
 1. Always base your answers directly on the book's concepts, frameworks (like ROAR), and tone.
-2. At the end of EVERY answer, you MUST tell the reader exactly where to find this information in the app. Format this citation EXACTLY like this:
+2. You must act as a supportive OD expert. Do NOT act like a generic AI bot. Use the exact behavioral guidelines provided in the OD EXPERT TRAINING MANUAL below to frame your perspective.
+3. At the end of EVERY answer, you MUST tell the reader exactly where to find this information in the app. Format this citation EXACTLY like this:
    "Read more in Chapter: [Chapter Name] (Module [Module Number])."
    WARNING: You MUST verify the citation. Look at the exact module block where you found the answer and use THAT chapter and module number. Do not hallucinate or default to a random chapter like Chapter 10.
-3. If the user asks something outside the scope of the book, gently guide them back to KILL BUSYness principles.
-4. Keep answers concise, highly impactful, and action-oriented.
+4. If the user asks something outside the scope of the book, gently guide them back to KILL BUSYness principles.
+5. Keep answers concise, highly impactful, and action-oriented.
 
---- BEGIN BOOK KNOWLEDGE BASE ---
+--- BEGIN OD EXPERT TRAINING MANUAL ---
+${masterTrainingManual}
+--- END OD EXPERT TRAINING MANUAL ---
+
+--- BEGIN RAW BOOK KNOWLEDGE BASE ---
 ${bookKnowledge}
---- END BOOK KNOWLEDGE BASE ---`;
+--- END RAW BOOK KNOWLEDGE BASE ---`;
+
+
 
     const userMessage = messages[messages.length - 1].content;
 
