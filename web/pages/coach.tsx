@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useChat } from '@ai-sdk/react';
-import { Box, Typography, TextField, IconButton, Paper, Button, Container, AppBar, Toolbar } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Paper, Button, Container, AppBar, Toolbar, Stack } from '@mui/material';
+import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
+import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
 
@@ -9,6 +12,21 @@ export default function CoachPage() {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [inlineFeedback, setInlineFeedback] = useState<Record<string, 'up' | 'down'>>({});
+
+  const handleInlineFeedback = async (logId: string, feedback: 'up' | 'down') => {
+    if (!logId) return;
+    setInlineFeedback(prev => ({ ...prev, [logId]: feedback }));
+    try {
+      await fetch('/api/coach/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ log_id: logId, feedback })
+      });
+    } catch (error) {
+      console.error('Failed to submit feedback', error);
+    }
+  };
 
   const handleCustomSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,7 +68,7 @@ export default function CoachPage() {
       
       setMessages((prev) => prev.map(msg => 
         msg.id === loadingId 
-          ? { id: Date.now().toString(), role: 'assistant', content: data.text || "Sorry, I received an empty response. Please try again." } 
+          ? { id: Date.now().toString(), role: 'assistant', content: data.text || "Sorry, I received an empty response. Please try again.", log_id: data.log_id } 
           : msg
       ));
     } catch (err: any) {
@@ -149,6 +167,24 @@ export default function CoachPage() {
                 <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
                   {m.content.replace('\\[END_SESSION\\]', '').replace('[END_SESSION]', '').trim()}
                 </Typography>
+                {m.role === 'assistant' && !m.isTemp && m.log_id && (
+                  <Stack direction="row" spacing={1} sx={{ mt: 2, pt: 1, borderTop: '1px solid #f1f5f9', justifyContent: 'flex-end' }}>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleInlineFeedback(m.log_id, 'up')}
+                      color={inlineFeedback[m.log_id] === 'up' ? 'success' : 'default'}
+                    >
+                      {inlineFeedback[m.log_id] === 'up' ? <ThumbUpIcon fontSize="small" /> : <ThumbUpOffAltIcon fontSize="small" />}
+                    </IconButton>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => handleInlineFeedback(m.log_id, 'down')}
+                      color={inlineFeedback[m.log_id] === 'down' ? 'error' : 'default'}
+                    >
+                      {inlineFeedback[m.log_id] === 'down' ? <ThumbDownIcon fontSize="small" /> : <ThumbDownOffAltIcon fontSize="small" />}
+                    </IconButton>
+                  </Stack>
+                )}
               </Paper>
             </Box>
           ))}

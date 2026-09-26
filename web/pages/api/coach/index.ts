@@ -1,5 +1,6 @@
 import allModules from '../../../public/data/all_modules.json';
 import { masterTrainingManual } from '../../../public/data/master_coach_training';
+import { supabase } from '../../../lib/supabase';
 
 export const config = {
   runtime: 'edge',
@@ -74,7 +75,25 @@ ${bookKnowledge}
 
     const textResponse = data.candidates[0].content.parts[0].text;
     
-    return new Response(JSON.stringify({ text: textResponse }), {
+    // Log the interaction anonymously
+    let logId = null;
+    try {
+      const { data: logData, error: logError } = await supabase
+        .from('anonymous_chat_logs')
+        .insert([{ question: userMessage, response: textResponse }])
+        .select()
+        .single();
+        
+      if (logError) {
+        console.error('Supabase Log Error:', logError);
+      } else if (logData) {
+        logId = logData.id;
+      }
+    } catch (dbErr) {
+      console.error('Database connection failed:', dbErr);
+    }
+    
+    return new Response(JSON.stringify({ text: textResponse, log_id: logId }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
