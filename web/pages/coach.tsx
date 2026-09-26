@@ -16,7 +16,22 @@ export default function CoachPage() {
     
     const userMessage = input;
     setInput('');
-    setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'user', content: userMessage }]);
+    
+    const loadingPhrases = [
+      "Thanks for your query. Let me consult the KILL BUSYness frameworks...",
+      "Give me just a minute to pull the right OD perspective for you...",
+      "Reflecting on that... let me see what the methodology suggests.",
+      "That's a great question. Processing your query now...",
+      "Let me dive into the book and get the best answer for you..."
+    ];
+    const randomPhrase = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+    const loadingId = 'loading-' + Date.now().toString();
+
+    setMessages((prev) => [
+      ...prev, 
+      { id: Date.now().toString(), role: 'user', content: userMessage },
+      { id: loadingId, role: 'assistant', content: randomPhrase, isTemp: true }
+    ]);
     setIsLoading(true);
     
     try {
@@ -33,10 +48,11 @@ export default function CoachPage() {
       
       const data = await res.json();
       
-      setMessages((prev) => [
-        ...prev, 
-        { id: Date.now().toString(), role: 'assistant', content: data.text || "Sorry, I received an empty response. Please try again." }
-      ]);
+      setMessages((prev) => prev.map(msg => 
+        msg.id === loadingId 
+          ? { id: Date.now().toString(), role: 'assistant', content: data.text || "Sorry, I received an empty response. Please try again." } 
+          : msg
+      ));
     } catch (err: any) {
       console.error("Submit error:", err);
       let errorMsg = "An error occurred while connecting to the Coach. Please try again.";
@@ -44,10 +60,11 @@ export default function CoachPage() {
         errorMsg = "Google's AI servers are currently experiencing extremely high demand and are overloaded. Please wait a moment and try asking again.";
       }
       
-      setMessages((prev) => [
-        ...prev, 
-        { id: Date.now().toString(), role: 'assistant', content: `⚠️ **Server Overloaded**\n\n${errorMsg}` }
-      ]);
+      setMessages((prev) => prev.map(msg => 
+        msg.id === loadingId 
+          ? { id: Date.now().toString(), role: 'assistant', content: `⚠️ **Server Overloaded**\n\n${errorMsg}` } 
+          : msg
+      ));
     } finally {
       setIsLoading(false);
     }
@@ -110,12 +127,20 @@ export default function CoachPage() {
                 p: 2, 
                 maxWidth: '85%', 
                 bgcolor: m.role === 'user' ? '#0b1730' : 'white',
-                color: m.role === 'user' ? 'white' : '#0b1730',
+                color: m.role === 'user' ? 'white' : (m.isTemp ? '#64748b' : '#0b1730'),
                 borderRadius: 4,
                 borderBottomRightRadius: m.role === 'user' ? 4 : 24,
                 borderBottomLeftRadius: m.role === 'user' ? 24 : 4,
                 boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-                whiteSpace: 'pre-wrap'
+                whiteSpace: 'pre-wrap',
+                opacity: m.isTemp ? 0.7 : 1,
+                fontStyle: m.isTemp ? 'italic' : 'normal',
+                animation: m.isTemp ? 'pulse 1.5s infinite' : 'none',
+                '@keyframes pulse': {
+                  '0%': { opacity: 0.6 },
+                  '50%': { opacity: 0.9 },
+                  '100%': { opacity: 0.6 }
+                }
               }}>
                 <Typography variant="body1" sx={{ lineHeight: 1.6 }}>{m.content}</Typography>
               </Paper>
