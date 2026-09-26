@@ -61,13 +61,9 @@ ${bookKnowledge}
 
     const textResponse = data.candidates[0].content.parts[0].text;
     
-    // Simulate Vercel AI SDK text stream format for the frontend (0:"text")
-    const jsonString = JSON.stringify(textResponse);
-    const streamPayload = '0:' + jsonString + '\\n';
-
-    return new Response(streamPayload, {
+    return new Response(JSON.stringify({ text: textResponse }), {
       status: 200,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (error: any) {
     console.error('AI Coach Error:', error);

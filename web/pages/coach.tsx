@@ -39,33 +39,12 @@ export default function CoachPage() {
         throw new Error(`Server returned ${res.status}: ${errorText.substring(0, 100)}`);
       }
       
-      const reader = res.body?.getReader();
-      const decoder = new TextDecoder();
-      let aiResponse = '';
+      const data = await res.json();
       
-      chatObj.setMessages((prev: any) => [...prev, { id: 'ai-temp', role: 'assistant', content: '' }]);
-      
-      while (reader) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        if (chunk.startsWith('0:')) {
-          try {
-            // chunk is format: 0:"The text response"\n
-            // substring(2) removes '0:', leaving valid JSON string
-            const parsedText = JSON.parse(chunk.substring(2));
-            aiResponse += parsedText;
-            
-            chatObj.setMessages((prev: any) => {
-              const newMessages = [...prev];
-              newMessages[newMessages.length - 1].content = aiResponse;
-              return newMessages;
-            });
-          } catch (e) {
-            console.error('Failed to parse chunk:', chunk);
-          }
-        }
-      }
+      chatObj.setMessages((prev: any) => [
+        ...prev, 
+        { id: 'ai-temp', role: 'assistant', content: data.text }
+      ]);
     } catch (err: any) {
       console.error("Submit error:", err);
       alert("Submit Error: " + err.message);
