@@ -26,3 +26,5 @@ public/fallback-*.js.map
 # Misc
 .DS_Store
 *.pem
+
+.vercel
