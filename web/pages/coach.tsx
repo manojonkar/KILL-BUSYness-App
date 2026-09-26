@@ -19,20 +19,47 @@ export default function CoachPage() {
   const status = chatObj.status || '';
   const isLoading = status === 'submitted' || status === 'streaming' || chatObj.isLoading;
 
-  const handleCustomSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCustomSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
     
-    console.log("Submitting form...", input);
+    const userMessage = input;
+    setInput('');
+    chatObj.setMessages([...messages, { id: Date.now().toString(), role: 'user', content: userMessage }]);
+    
     try {
-      if (chatObj.append) {
-        chatObj.append({ role: 'user', content: input });
-      } else if (chatObj.sendMessage) {
-        chatObj.sendMessage({ role: 'user', content: input });
-      } else {
-        throw new Error("SDK method missing. Available keys: " + Object.keys(chatObj).join(', '));
+      const res = await fetch('/api/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, { role: 'user', content: userMessage }] })
+      });
+      
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Server returned ${res.status}: ${errorText.substring(0, 100)}`);
       }
-      setInput('');
+      
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let aiResponse = '';
+      
+      chatObj.setMessages((prev: any) => [...prev, { id: 'ai-temp', role: 'assistant', content: '' }]);
+      
+      while (reader) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        // Vercel SDK sends chunks like 0:"text"
+        const match = chunk.match(/^0:"(.*)"$/m);
+        if (match) {
+          aiResponse += match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+          chatObj.setMessages((prev: any) => {
+            const newMessages = [...prev];
+            newMessages[newMessages.length - 1].content = aiResponse;
+            return newMessages;
+          });
+        }
+      }
     } catch (err: any) {
       console.error("Submit error:", err);
       alert("Submit Error: " + err.message);
