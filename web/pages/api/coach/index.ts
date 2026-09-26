@@ -16,7 +16,9 @@ export default async function handler(req: Request) {
   try {
     const { messages }: { messages: any[] } = await req.json();
 
-    const bookKnowledge = allModules.map((m: any) => 
+    // Google's new 3.8-flash model has an 8k token limit, so we can't stuff all 80 modules in.
+    // We slice to the first 10 modules (~4000 tokens) to ensure it fits safely.
+    const bookKnowledge = allModules.slice(0, 10).map((m: any) => 
       `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
     ).join('\n\n---\n\n');
 
