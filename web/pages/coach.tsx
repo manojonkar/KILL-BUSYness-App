@@ -49,15 +49,21 @@ export default function CoachPage() {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value);
-        // Vercel SDK sends chunks like 0:"text"
-        const match = chunk.match(/^0:"(.*)"$/m);
-        if (match) {
-          aiResponse += match[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
-          chatObj.setMessages((prev: any) => {
-            const newMessages = [...prev];
-            newMessages[newMessages.length - 1].content = aiResponse;
-            return newMessages;
-          });
+        if (chunk.startsWith('0:')) {
+          try {
+            // chunk is format: 0:"The text response"\n
+            // substring(2) removes '0:', leaving valid JSON string
+            const parsedText = JSON.parse(chunk.substring(2));
+            aiResponse += parsedText;
+            
+            chatObj.setMessages((prev: any) => {
+              const newMessages = [...prev];
+              newMessages[newMessages.length - 1].content = aiResponse;
+              return newMessages;
+            });
+          } catch (e) {
+            console.error('Failed to parse chunk:', chunk);
+          }
         }
       }
     } catch (err: any) {
