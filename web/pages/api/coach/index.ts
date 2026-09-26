@@ -18,14 +18,8 @@ export default async function handler(req: Request) {
   try {
     const { messages }: { messages: any[] } = await req.json();
 
-    // We use gemini-3.5-flash-lite because it handles the massive 1M token context window flawlessly
-    // and is highly resilient against Google's 503 free-tier throttling.
-    const bookKnowledge = allModules.map((m: any) => 
-      `Module ${m.linear_id} (Chapter: ${m.chapter}): ${m.title}\n${m.core_lesson}`
-    ).join('\n\n---\n\n');
-
     const systemPrompt = `You are Manoj Onkar's rigorous AI Coach, exclusively trained on the book "KILL BUSYness".
-Your job is to answer the user's questions strictly based on the book text provided below.
+Your job is to answer the user's questions strictly based on the OD Expert Training Manual provided below.
 
 CRITICAL INSTRUCTIONS:
 1. Always base your answers directly on the book's concepts, frameworks (like ROAR), and tone.
@@ -40,11 +34,7 @@ CRITICAL INSTRUCTIONS:
 
 --- BEGIN OD EXPERT TRAINING MANUAL ---
 ${masterTrainingManual}
---- END OD EXPERT TRAINING MANUAL ---
-
---- BEGIN RAW BOOK KNOWLEDGE BASE ---
-${bookKnowledge}
---- END RAW BOOK KNOWLEDGE BASE ---`;
+--- END OD EXPERT TRAINING MANUAL ---`;
 
 
 
