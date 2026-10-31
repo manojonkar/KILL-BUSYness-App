@@ -1,4 +1,3 @@
-import allModules from '../../../public/data/all_modules.json';
 import { masterTrainingManual } from '../../../public/data/master_coach_training';
 import { supabase } from '../../../lib/supabase';
 
@@ -6,17 +5,34 @@ export const config = {
   runtime: 'edge',
 };
 
+const MODELS = [
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-8b',
+  'gemini-1.5-pro',
+  'gemini-2.0-flash-exp',
+];
+
 export default async function handler(req: Request) {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }
 
   if (!process.env.GEMINI_API_KEY) {
-    return new Response('Missing GEMINI_API_KEY in server configuration.', { status: 500 });
+    return new Response(JSON.stringify({ error: 'Missing GEMINI_API_KEY in server configuration.' }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
     const { messages }: { messages: any[] } = await req.json();
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return new Response(JSON.stringify({ error: 'Invalid or missing messages payload.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     const systemPrompt = `You are Manoj Onkar's rigorous AI Coach, exclusively trained on the book "KILL BUSYness".
 Your job is to answer the user's questions strictly based on the OD Expert Training Manual provided below.
@@ -36,35 +52,89 @@ CRITICAL INSTRUCTIONS:
 ${masterTrainingManual}
 --- END OD EXPERT TRAINING MANUAL ---`;
 
+    const userMessage = messages[messages.length - 1]?.content || '';
 
+    // Build sanitized Gemini contents with alternating user/model roles
+    const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
+    const recentMessages = messages.slice(-6);
 
-    const userMessage = messages[messages.length - 1].content;
+    for (const msg of recentMessages) {
+      const role: 'user' | 'model' = msg.role === 'assistant' ? 'model' : 'user';
+      const text = typeof msg.content === 'string' ? msg.content.trim() : '';
+      if (!text || msg.isTemp) continue;
+
+      if (contents.length === 0) {
+        if (role === 'user') {
+          contents.push({ role: 'user', parts: [{ text }] });
+        }
+      } else {
+        const lastEntry = contents[contents.length - 1];
+        if (lastEntry.role !== role) {
+          contents.push({ role, parts: [{ text }] });
+        } else {
+          lastEntry.parts[0].text += `\n\n${text}`;
+        }
+      }
+    }
+
+    if (contents.length === 0) {
+      contents.push({ role: 'user', parts: [{ text: userMessage || 'Hello' }] });
+    }
 
     const payload = {
       system_instruction: {
-        parts: { text: systemPrompt }
+        parts: [{ text: systemPrompt }]
       },
-      contents: [{
-        parts: [{ text: userMessage }]
-      }]
+      contents,
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 2048,
+      }
     };
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.5-flash-lite:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+    let textResponse = '';
+    let lastError: any = null;
 
-    const data = await response.json();
+    // Multi-model fallback hierarchy
+    for (const model of MODELS) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data.error));
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload),
+            signal: controller.signal,
+          }
+        );
+
+        clearTimeout(timeoutId);
+
+        const data = await response.json();
+
+        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          textResponse = data.candidates[0].content.parts[0].text;
+          break; // Success!
+        } else {
+          const errMsg = data?.error?.message || `HTTP ${response.status}`;
+          console.warn(`Model ${model} returned error:`, errMsg);
+          lastError = new Error(`Model ${model}: ${errMsg}`);
+        }
+      } catch (err: any) {
+        console.warn(`Model ${model} call failed:`, err.message);
+        lastError = err;
+      }
     }
 
-    const textResponse = data.candidates[0].content.parts[0].text;
-    
+    if (!textResponse) {
+      throw lastError || new Error('Unable to contact AI Coach. Please try again.');
+    }
+
     // Log the interaction anonymously
     let logId = null;
     try {
@@ -88,7 +158,7 @@ ${masterTrainingManual}
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error: any) {
-    console.error('AI Coach Error:', error);
+    console.error('AI Coach Handler Error:', error);
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }

@@ -73,14 +73,16 @@ export default function CoachPage() {
       ));
     } catch (err: any) {
       console.error("Submit error:", err);
-      let errorMsg = "An error occurred while connecting to the Coach. Please try again.";
-      if (err.message.includes("503") || err.message.includes("high demand")) {
-        errorMsg = "Google's AI servers are currently experiencing extremely high demand and are overloaded. Please wait a moment and try asking again.";
+      let title = "Connection Notice";
+      let errorMsg = "An error occurred while connecting to the Coach. Please try asking again.";
+      if (err.message.includes("503") || err.message.includes("high demand") || err.message.includes("overloaded")) {
+        title = "High Demand";
+        errorMsg = "Google's AI servers are currently experiencing high demand. Please wait a few seconds and try asking again.";
       }
       
       setMessages((prev) => prev.map(msg => 
         msg.id === loadingId 
-          ? { id: Date.now().toString(), role: 'assistant', content: `⚠️ **Server Overloaded**\n\n${errorMsg}` } 
+          ? { id: Date.now().toString(), role: 'assistant', content: `⚠️ **${title}**\n\n${errorMsg}` } 
           : msg
       ));
     } finally {
