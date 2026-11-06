@@ -17,23 +17,51 @@ export default function Login() {
     setLoading(true);
     setMessage('');
     
-    if (isSignUp) {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: name } }
-      });
-      if (error) setMessage(error.message);
-      else {
-        setMessage('Registration successful! Logging you in...');
-        setTimeout(() => router.push('/'), 1500);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
+    const cleanName = name.trim();
+
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email: cleanEmail,
+          password: cleanPassword,
+          options: { data: { full_name: cleanName } }
+        });
+        if (error) {
+          if (error.message.toLowerCase().includes('already registered')) {
+            setMessage('This email is already registered. Please log in below.');
+            setIsSignUp(false);
+          } else if (error.message.toLowerCase().includes('fetch')) {
+            setMessage('Server is reconnecting. Please wait 10 seconds and try again.');
+          } else {
+            setMessage(error.message);
+          }
+        } else {
+          setMessage('Registration successful! Logging you in...');
+          setTimeout(() => router.push('/'), 1200);
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ 
+          email: cleanEmail, 
+          password: cleanPassword 
+        });
+        if (error) {
+          if (error.message.toLowerCase().includes('fetch')) {
+            setMessage('Server is reconnecting. Please wait 10 seconds and try again.');
+          } else {
+            setMessage(error.message);
+          }
+        } else {
+          router.push('/');
+        }
       }
-    } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setMessage(error.message);
-      else router.push('/');
+    } catch (err: any) {
+      console.error('Auth error:', err);
+      setMessage(err?.message || 'Connection error. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
